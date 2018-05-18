@@ -52,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Intent intent = new Intent(this, StoreListActivity.class);
-        String userId = currentUser.getUid();
-        intent.putExtra(USER_ID, userId);
         startActivity(intent);
     }
 

@@ -8,8 +8,6 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import static com.made.madesc.MainActivity.USER_ID;
-
 public class StoreListActivity extends AppCompatActivity {
 
     @Override
