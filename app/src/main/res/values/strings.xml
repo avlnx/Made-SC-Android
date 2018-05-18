@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">Made</string>
+
+    <!-- Forms -->
     <string name="password_hint">Sua senha</string>
     <string name="example_email">seuemail@exemplo.com</string>
     <string name="bt_login_text">Login</string>
+
+    <!-- Messages -->
+    <string name="login_failed_message">O login falhou. Tente novamente.</string>
+
+    <!-- Interface -->
+    <string name="hello_text">Olá %1$s</string>
 </resources>
