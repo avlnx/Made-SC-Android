@@ -18,18 +18,17 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
     private EditText mEditTextEmail;
     private EditText mEditTextPassword;
     private Button mButtonLogin;
-    public static final String USER_ID = "com.made.madesc.USER_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mEditTextEmail = findViewById(R.id.et_email);
         mEditTextPassword = findViewById(R.id.et_password);
@@ -40,15 +39,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        // Checks if user is signed in and moves to appropriate activity if so
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        goToStoreList(currentUser);
+        if (mCurrentUser != null) {
+            goToStoreList();
+        }
 
     }
 
-    private void goToStoreList(FirebaseUser currentUser) {
-        if (currentUser == null) {
+    private void goToStoreList() {
+        if (mCurrentUser == null) {
             return;
         }
         Intent intent = new Intent(this, StoreListActivity.class);
@@ -62,15 +60,23 @@ public class MainActivity extends AppCompatActivity {
         String email = mEditTextEmail.getText().toString();
         String password = mEditTextPassword.getText().toString();
 
-        mAuth.signInWithEmailAndPassword(email, password)
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(MainActivity.this, R.string.login_form_empty,
+                    Toast.LENGTH_SHORT).show();
+            // Restore login button
+            mButtonLogin.setEnabled(true);
+            return;
+        }
+
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("MainActivity", "signInWithEmail:success");
-                            FirebaseUser currentUser = mAuth.getCurrentUser();
-                            goToStoreList(currentUser);
+                            mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+                            goToStoreList();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("MainActivity", "signInWithEmail:failure", task.getException());
@@ -81,7 +87,5 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-        goToStoreList(null);
     }
 }

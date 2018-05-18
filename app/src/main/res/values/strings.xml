@@ -5,9 +5,11 @@
     <string name="password_hint">Sua senha</string>
     <string name="example_email">seuemail@exemplo.com</string>
     <string name="bt_login_text">Login</string>
+    <string name="bt_logout_text">Sair</string>
 
     <!-- Messages -->
     <string name="login_failed_message">O login falhou. Tente novamente.</string>
+    <string name="login_form_empty">Os campos email e password são obrigatórios.</string>
 
     <!-- Interface -->
     <string name="hello_text">Olá %1$s</string>
