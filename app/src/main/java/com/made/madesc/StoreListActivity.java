@@ -34,6 +34,8 @@ public class StoreListActivity extends AppCompatActivity {
     RecyclerView mStoreListRecyclerView;
     StoreListAdapter mStoreListAdapter;
 
+    public static final String ACTIVE_STORE = "com.made.madesc.ACTIVE_STORE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,21 +107,23 @@ public class StoreListActivity extends AppCompatActivity {
         };
     }
 
-    private void startKioskMode(String storeId) {
+    private void startKioskMode(final String storeId) {
         // User clicked one of the stores cards, show message pre loading
         AlertDialog.Builder builder = new AlertDialog.Builder(StoreListActivity.this);
         builder.setMessage(R.string.dialog_confirm_start_store_message)
                 .setTitle(R.string.dialog_confirm_start_store_title);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
-                Toast.makeText(StoreListActivity.this, "Store would have started", Toast.LENGTH_SHORT).show();
+                // Go to KioskMode
+                Intent intent = new Intent(StoreListActivity.this, KioskActivity.class);
+                intent.putExtra(ACTIVE_STORE, storeId);
+                startActivity(intent);
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
-                Toast.makeText(StoreListActivity.this, "You canceled the request :(", Toast.LENGTH_SHORT).show();
+                Toast.makeText(StoreListActivity.this, "O modo Quiosque não será ativado", Toast.LENGTH_SHORT).show();
             }
         });
         AlertDialog dialog = builder.create();

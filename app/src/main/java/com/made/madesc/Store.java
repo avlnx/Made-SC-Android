@@ -8,20 +8,20 @@ public class Store {
     private String nickname;
     private String storeId;
 
+    public Store() {}
+
+    public Store(HashMap inventory, boolean isActive, String nickname) {
+        this.inventory = inventory;
+        this.isActive = isActive;
+        this.nickname = nickname;
+    }
+
     public String getStoreId() {
         return storeId;
     }
 
     public void setStoreId(String storeId) {
         this.storeId = storeId;
-    }
-
-    public Store() {}
-
-    public Store(HashMap inventory, boolean isActive, String nickname) {
-        inventory = inventory;
-        isActive = isActive;
-        nickname = nickname;
     }
 
     public HashMap<String, Integer> getInventory() {

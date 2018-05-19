@@ -16,6 +16,10 @@
     modo Quiosque toque o canto superior direito da tela duas vezes.</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
+    <string name="kiosk_welcome_message">Olá! Utilize o leitor de código de barras para adicionar
+    produtos à sua cesta de compras :)</string>
+    <string name="kiosk_loading_inventory_message">Abastacendo sua loja :)</string>
+    <string name="kiosk_loading_catalog_message">Sincronizando o catálogo</string>
 
     <!-- Interface -->
     <string name="hello_text">Olá %1$s</string>
