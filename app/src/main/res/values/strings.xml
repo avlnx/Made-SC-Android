@@ -28,5 +28,6 @@
 
     <!-- Interface -->
     <string name="hello_text">Olá %1$s</string>
+    <string name="store_list_loading">Carregando suas lojas</string>
     <string name="store_list_title">Toque em uma de suas lojas para começar a vender</string>
 </resources>

@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,16 +28,19 @@ import java.util.ArrayList;
 
 public class StoreListActivity extends AppCompatActivity {
 
-    FirebaseUser mCurrentUser;
+    // Views
+    RecyclerView mStoreListRecyclerView;
     Button mLogoutButton;
+    ProgressBar mPbLoader;
+    TextView mMessageTextView;
+
+    // Data
+    FirebaseUser mCurrentUser;
     FirebaseFirestore mDb;
     ArrayList<Store> mStores;
-    RecyclerView mStoreListRecyclerView;
     StoreListAdapter mStoreListAdapter;
 
     public static final String ACTIVE_STORE = "com.made.madesc.ACTIVE_STORE";
-
-    // TODO: show loader before the stores are loaded
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,9 @@ public class StoreListActivity extends AppCompatActivity {
 
         // Set up instance properties
         mLogoutButton = findViewById(R.id.bt_log_out);
+        mPbLoader = findViewById(R.id.pb_loader);
+        mMessageTextView = findViewById(R.id.tv_message);
+
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mDb = FirebaseFirestore.getInstance();
 
@@ -79,11 +86,18 @@ public class StoreListActivity extends AppCompatActivity {
                             }
                             // Notify changes in the stores adapter now that we have the data
                             mStoreListAdapter.notifyDataSetChanged();
+                            updateUiAfterLoad();
                         } else {
                             Log.w("StoreListActivity", "Error getting documents.", task.getException());
                         }
                     }
                 });
+    }
+
+    private void updateUiAfterLoad() {
+        mMessageTextView.setText(R.string.store_list_title);
+        mPbLoader.setVisibility(View.INVISIBLE);
+        mStoreListRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void setupStoreListAdapter() {

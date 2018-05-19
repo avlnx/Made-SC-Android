@@ -186,6 +186,7 @@ public class KioskActivity extends AppCompatActivity {
         return mCatalog.get(productId);
     }
 
+    // Debug
     public void debugAddToCart(View v) {
         // get a random product from the inventory and add it to the scrollview and cart summary
         Product product = getRandomProductFromInventory();
