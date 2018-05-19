@@ -10,6 +10,11 @@ import java.util.ArrayList;
 
 public class StoreListAdapter extends RecyclerView.Adapter<StoreListAdapter.StoreViewHolder> {
     private ArrayList<Store> mDataSet;
+    private CustomItemClickListener mListener;
+
+    public interface CustomItemClickListener {
+        public void onItemClick(View v, int position);
+    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -25,8 +30,9 @@ public class StoreListAdapter extends RecyclerView.Adapter<StoreListAdapter.Stor
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    StoreListAdapter(ArrayList<Store> stores) {
+    StoreListAdapter(ArrayList<Store> stores, CustomItemClickListener listener) {
         this.mDataSet = stores;
+        this.mListener = listener;
     }
 
     // Create new views (invoked by the layout manager)
@@ -36,7 +42,16 @@ public class StoreListAdapter extends RecyclerView.Adapter<StoreListAdapter.Stor
         View view = (View) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.store_list_row, parent, false);
 
-        return new StoreViewHolder(view);
+        final StoreViewHolder viewHolder = new StoreViewHolder(view);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onItemClick(v, viewHolder.getAdapterPosition());
+            }
+        });
+
+        return viewHolder;
     }
 
     // Replace the contents of a view (invoked by the layout manager)

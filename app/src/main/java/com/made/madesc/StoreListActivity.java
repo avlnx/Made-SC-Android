@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -81,13 +82,24 @@ public class StoreListActivity extends AppCompatActivity {
     private void setupStoreListAdapter() {
         mStoreListRecyclerView = (RecyclerView) findViewById(R.id.rv_stores_list);
 
-        mStoreListAdapter = new StoreListAdapter(mStores);
+        mStoreListAdapter = new StoreListAdapter(mStores, getCustomItemClickListener());
         mStoreListRecyclerView.setAdapter(mStoreListAdapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mStoreListRecyclerView.setLayoutManager(linearLayoutManager);
 
         mStoreListRecyclerView.setHasFixedSize(true);
+    }
+
+    private StoreListAdapter.CustomItemClickListener getCustomItemClickListener() {
+        return new StoreListAdapter.CustomItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Log.d("StoreListActivity", "clicked position:" + position);
+                String nickname = mStores.get(position).getNickname();
+                Toast.makeText(StoreListActivity.this, "You clicked " + nickname, Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 
     private void goToLoginScreen() {
