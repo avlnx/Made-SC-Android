@@ -68,6 +68,7 @@ public class StoreListActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d("StoreListActivity", document.getId() + " => " + document.getData());
                                 Store store = document.toObject(Store.class);
+                                store.setStoreId(document.getId());
                                 mStores.add(store);
                             }
                             // Notify changes in the stores adapter now that we have the data
@@ -96,8 +97,8 @@ public class StoreListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View v, int position) {
                 Log.d("StoreListActivity", "clicked position:" + position);
-                String nickname = mStores.get(position).getNickname();
-                Toast.makeText(StoreListActivity.this, "You clicked " + nickname, Toast.LENGTH_SHORT).show();
+                String storeId = mStores.get(position).getStoreId();
+                Toast.makeText(StoreListActivity.this, "You clicked " + storeId, Toast.LENGTH_SHORT).show();
             }
         };
     }

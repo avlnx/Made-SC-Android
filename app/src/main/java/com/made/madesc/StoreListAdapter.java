@@ -13,7 +13,7 @@ public class StoreListAdapter extends RecyclerView.Adapter<StoreListAdapter.Stor
     private CustomItemClickListener mListener;
 
     public interface CustomItemClickListener {
-        public void onItemClick(View v, int position);
+        void onItemClick(View v, int position);
     }
 
     // Provide a reference to the views for each data item
