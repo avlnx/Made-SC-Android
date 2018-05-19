@@ -10,6 +10,12 @@
     <!-- Messages -->
     <string name="login_failed_message">O login falhou. Tente novamente.</string>
     <string name="login_form_empty">Os campos email e password são obrigatórios.</string>
+    <string name="dialog_confirm_start_store_title">Atenção! O modo Quiosque será ativado!</string>
+    <string name="dialog_confirm_start_store_message">Ao abrir uma das lojas no modo Quiosque as
+        interfaces padrões como o botão home e o botão voltar serão desabilitados. Para sair do
+    modo Quiosque toque o canto superior direito da tela duas vezes.</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
 
     <!-- Interface -->
     <string name="hello_text">Olá %1$s</string>

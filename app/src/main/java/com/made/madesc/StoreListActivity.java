@@ -1,7 +1,9 @@
 package com.made.madesc;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -98,9 +100,30 @@ public class StoreListActivity extends AppCompatActivity {
             public void onItemClick(View v, int position) {
                 Log.d("StoreListActivity", "clicked position:" + position);
                 String storeId = mStores.get(position).getStoreId();
-                Toast.makeText(StoreListActivity.this, "You clicked " + storeId, Toast.LENGTH_SHORT).show();
+                startKioskMode(storeId);
             }
         };
+    }
+
+    private void startKioskMode(String storeId) {
+        // User clicked one of the stores cards, show message pre loading
+        AlertDialog.Builder builder = new AlertDialog.Builder(StoreListActivity.this);
+        builder.setMessage(R.string.dialog_confirm_start_store_message)
+                .setTitle(R.string.dialog_confirm_start_store_title);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                Toast.makeText(StoreListActivity.this, "Store would have started", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                Toast.makeText(StoreListActivity.this, "You canceled the request :(", Toast.LENGTH_SHORT).show();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void goToLoginScreen() {
