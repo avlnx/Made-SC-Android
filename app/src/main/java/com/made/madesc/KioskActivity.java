@@ -19,6 +19,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.Random;
 
 public class KioskActivity extends AppCompatActivity {
 
@@ -39,6 +40,7 @@ public class KioskActivity extends AppCompatActivity {
         // TODO: Add to device disk that we opened this store
         // TODO: Setup Kiosk mode
         // TODO: Setup click handler to leave Kiosk mode
+        // TODO: set up snapshotquerys for updates?
 
         // Get the storeId for the active store from the intent
         Intent intent = getIntent();
@@ -116,5 +118,19 @@ public class KioskActivity extends AppCompatActivity {
 
         // TODO: Show Barcode reader and Cart widget
 
+    }
+
+    private void debugProductAdd() {
+        // get a random product from the inventory and add it to the scrollview
+        int numOfProducts = mActiveStore.getInventory().size();
+        int randomItem = new Random().nextInt(numOfProducts);
+        String productId = mActiveStore.getInventory().keySet().toArray()[randomItem].toString();
+        Product product = mCatalog.get(productId);
+    }
+
+    private void debugLogInventory() {
+        for (HashMap.Entry<String, Integer> product : mActiveStore.getInventory().entrySet() ){
+            Log.d("KioskActivity", String.format("%s: %d unidades", product.getKey(), product.getValue()));
+        }
     }
 }

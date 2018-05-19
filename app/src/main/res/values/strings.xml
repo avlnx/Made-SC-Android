@@ -6,6 +6,7 @@
     <string name="example_email">seuemail@exemplo.com</string>
     <string name="bt_login_text">Login</string>
     <string name="bt_logout_text">Sair</string>
+    <string name="bt_checkout">Checkout</string>
 
     <!-- Messages -->
     <string name="login_failed_message">O login falhou. Tente novamente.</string>
