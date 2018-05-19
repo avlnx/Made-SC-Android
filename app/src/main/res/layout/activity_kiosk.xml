@@ -24,7 +24,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/kiosk_welcome_message"
         android:textAlignment="center"
-        android:textSize="18sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -34,10 +34,11 @@
         style="@android:style/Widget.Material.ProgressBar.Large"
         android:layout_width="96dp"
         android:layout_height="96dp"
+        android:layout_marginTop="8dp"
         android:indeterminate="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
 
 </android.support.constraint.ConstraintLayout>
