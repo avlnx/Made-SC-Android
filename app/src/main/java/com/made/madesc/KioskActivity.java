@@ -143,8 +143,9 @@ public class KioskActivity extends AppCompatActivity {
     private void updateCartInterface() {
         mCartTotalTextView.setText(Cart.getCartTotalCurrencyRepresentation());
         if (Cart.isEmpty()) {
-            mCartNumOfItemsTextView.setText("");
+            mCartNumOfItemsTextView.setVisibility(View.INVISIBLE);
         } else {
+            mCartNumOfItemsTextView.setVisibility(View.VISIBLE);
             mCartNumOfItemsTextView.setText(Cart.getCartNumOfItemsRepresentation());
         }
         // Disable or enable checkout button based on the emptyness of the cart
