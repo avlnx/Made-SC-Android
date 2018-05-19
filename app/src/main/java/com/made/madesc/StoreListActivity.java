@@ -36,6 +36,8 @@ public class StoreListActivity extends AppCompatActivity {
 
     public static final String ACTIVE_STORE = "com.made.madesc.ACTIVE_STORE";
 
+    // TODO: show loader before the stores are loaded
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

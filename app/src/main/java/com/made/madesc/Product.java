@@ -54,10 +54,6 @@ public class Product {
         this.publicPrice = BigDecimal.valueOf(publicPrice);
     }
 
-//    public void setPublicPrice(BigDecimal publicPrice) {
-//        this.publicPrice = publicPrice;
-//    }
-
     public String getTitle() {
         return title;
     }

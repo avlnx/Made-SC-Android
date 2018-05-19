@@ -18,9 +18,13 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
     <string name="kiosk_welcome_message">Olá! Utilize o leitor de código de barras para adicionar
-    produtos à sua cesta de compras :)</string>
+    produtos ao carrinho :)</string>
     <string name="kiosk_loading_inventory_message">Abastacendo sua loja :)</string>
     <string name="kiosk_loading_catalog_message">Sincronizando o catálogo</string>
+
+    <string name="cart_product_removed_successfully">%1$s removido do carrinho</string>
+    <string name="cart_product_added_successfully">%1$s adicionado ao carrinho</string>
+    <string name="cart_product_not_in_cart">Ops! %1$s não está no seu carrinho.</string>
 
     <!-- Interface -->
     <string name="hello_text">Olá %1$s</string>
