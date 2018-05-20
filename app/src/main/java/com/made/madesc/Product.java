@@ -12,28 +12,27 @@ public class Product {
     private String title;
     private String image;
     private String productId;
+    private String barcode;
 
     public Product() {}
 
-    public Product(double costForUser, String description, double publicPrice, String title, String image, String productId) {
+    public Product(double costForUser, String description, double publicPrice, String title, String image, String productId, String barcode) {
         this.costForUser = BigDecimal.valueOf(costForUser);
         this.description = description;
         this.publicPrice = BigDecimal.valueOf(publicPrice);
         this.title = title;
         this.image = image;
         this.productId = productId;
+        this.barcode = barcode;
     }
 
-//    public static Product findProductByIdFromCatalog(ArrayList<Product> products, String productId) {
-//        Product productFound = null;
-//        for (Product product : products) {
-//            if (product.productId.equals(productId)) {
-//                productFound = product;
-//                break;
-//            }
-//        }
-//        return productFound;
-//    }
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
 
     public String getProductId() {
         return productId;
