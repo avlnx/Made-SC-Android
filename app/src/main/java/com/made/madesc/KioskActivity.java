@@ -23,6 +23,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -50,6 +52,8 @@ public class KioskActivity extends AppCompatActivity {
     private String mActiveStoreId;
     CartItemAdapter mCartItemAdapter;
     ArrayList<Product> mProductsInCart;
+
+    public final int CUSTOMIZED_REQUEST_CODE = 0x0000ffff;
 
     public static final String CATALOG = "made";
 
@@ -87,6 +91,38 @@ public class KioskActivity extends AppCompatActivity {
 
         // Load catalog (template)
         loadCatalog();
+    }
+
+    // Barcode Scanning funcitonality, following two methods
+    public void onClickScan(View v) {
+        new IntentIntegrator(this).initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != CUSTOMIZED_REQUEST_CODE && requestCode != IntentIntegrator.REQUEST_CODE) {
+            // This is important, otherwise the result will not be passed to the fragment
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+        switch (requestCode) {
+            case CUSTOMIZED_REQUEST_CODE: {
+                Toast.makeText(this, "REQUEST_CODE = " + requestCode, Toast.LENGTH_LONG).show();
+                break;
+            }
+            default:
+                break;
+        }
+
+        IntentResult result = IntentIntegrator.parseActivityResult(resultCode, data);
+
+        if(result.getContents() == null) {
+            Log.d("MainActivity", "Cancelled scan");
+            Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+        } else {
+            Log.d("MainActivity", "Scanned");
+            Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setupCartItemAdapter() {
