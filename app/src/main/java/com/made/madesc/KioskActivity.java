@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,8 +25,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+
+import static android.support.v7.widget.DividerItemDecoration.HORIZONTAL;
+import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class KioskActivity extends AppCompatActivity {
 
@@ -33,6 +40,7 @@ public class KioskActivity extends AppCompatActivity {
     private TextView mCartTotalTextView;
     private Button mCheckoutButton;
     private LinearLayout mCartSummaryLayout;
+    private RecyclerView mCartItemRecyclerView;
 
     // Data
     private HashMap<String, Product> mCatalog;
@@ -40,6 +48,8 @@ public class KioskActivity extends AppCompatActivity {
     FirebaseUser mCurrentUser;
     private Store mActiveStore;
     private String mActiveStoreId;
+    CartItemAdapter mCartItemAdapter;
+    ArrayList<Product> mProductsInCart;
 
     public static final String CATALOG = "made";
 
@@ -63,6 +73,7 @@ public class KioskActivity extends AppCompatActivity {
         mCartNumOfItemsTextView = findViewById(R.id.tv_cart_num_of_items);
         mCartTotalTextView = findViewById(R.id.tv_cart_total);
         mCheckoutButton = findViewById(R.id.bt_checkout);
+        mCartItemRecyclerView = findViewById(R.id.rv_cart_items);
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -70,8 +81,27 @@ public class KioskActivity extends AppCompatActivity {
 
         mCatalog = new HashMap<>();
 
+        mProductsInCart = new ArrayList<Product>();
+        // set up adapter with empty data, we later update it
+        setupCartItemAdapter();
+
         // Load catalog (template)
         loadCatalog();
+    }
+
+    private void setupCartItemAdapter() {
+        mCartItemAdapter = new CartItemAdapter(mProductsInCart);
+        mCartItemRecyclerView.setAdapter(mCartItemAdapter);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mCartItemRecyclerView.setLayoutManager(linearLayoutManager);
+
+        mCartItemRecyclerView.setHasFixedSize(true);
+
+        // Add horizontal divider
+        DividerItemDecoration itemDecor = new DividerItemDecoration(this, VERTICAL);
+        itemDecor.setOrientation(VERTICAL);
+        mCartItemRecyclerView.addItemDecoration(itemDecor);
     }
 
     private void loadCatalog() {
@@ -150,6 +180,10 @@ public class KioskActivity extends AppCompatActivity {
         }
         // Disable or enable checkout button based on the emptyness of the cart
         mCheckoutButton.setEnabled(!Cart.isEmpty());
+
+        // Update local array of products in cart so the adapter can get notified
+        Cart.updateProductsInCartArray(mProductsInCart, mCatalog);
+        mCartItemAdapter.notifyDataSetChanged();
     }
 
     private void addProductToCart(String productId) {

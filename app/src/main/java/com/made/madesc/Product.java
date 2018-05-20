@@ -2,6 +2,8 @@ package com.made.madesc;
 
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 public class Product {
     private BigDecimal costForUser;
@@ -21,6 +23,17 @@ public class Product {
         this.image = image;
         this.productId = productId;
     }
+
+//    public static Product findProductByIdFromCatalog(ArrayList<Product> products, String productId) {
+//        Product productFound = null;
+//        for (Product product : products) {
+//            if (product.productId.equals(productId)) {
+//                productFound = product;
+//                break;
+//            }
+//        }
+//        return productFound;
+//    }
 
     public String getProductId() {
         return productId;
@@ -48,6 +61,10 @@ public class Product {
 
     public BigDecimal getPublicPrice() {
         return publicPrice;
+    }
+
+    public String getPublicPriceCurrencyRepresentation() {
+        return NumberFormat.getCurrencyInstance().format(publicPrice);
     }
 
     public void setPublicPrice(double publicPrice) {
