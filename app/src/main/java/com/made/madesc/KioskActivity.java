@@ -1,6 +1,7 @@
 package com.made.madesc;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,12 +25,22 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.ResultPoint;
+import com.google.zxing.client.android.BeepManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.journeyapps.barcodescanner.BarcodeCallback;
+import com.journeyapps.barcodescanner.BarcodeResult;
+import com.journeyapps.barcodescanner.DecoratedBarcodeView;
+import com.journeyapps.barcodescanner.DefaultDecoderFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import static android.support.v7.widget.DividerItemDecoration.HORIZONTAL;
@@ -52,15 +64,71 @@ public class KioskActivity extends AppCompatActivity {
     private String mActiveStoreId;
     CartItemAdapter mCartItemAdapter;
     ArrayList<Product> mProductsInCart;
+    // Barcode
+    private static final String TAG = KioskActivity.class.getSimpleName();
+    private DecoratedBarcodeView barcodeView;
+    private BeepManager beepManager;
+    private String lastText;
 
     public final int CUSTOMIZED_REQUEST_CODE = 0x0000ffff;
 
     public static final String CATALOG = "made";
 
+    private BarcodeCallback callback = new BarcodeCallback() {
+        @Override
+        public void barcodeResult(BarcodeResult result) {
+            if(result.getText() == null) {
+                // Prevent duplicate scans
+                return;
+            }
+
+            lastText = result.getText();
+            beepManager.playBeepSoundAndVibrate();
+            Product product = findProductWithBarcode(lastText);
+            if (product != null) {
+                addProductToCart(product);
+            } else {
+                // Product not found
+                String resourceString = getResources().getString(R.string.barcode_product_not_found);
+                Toast.makeText(KioskActivity.this, String.format(resourceString, lastText), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void possibleResultPoints(List<ResultPoint> resultPoints) {
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kiosk);
+
+        // Barcode stuff
+        barcodeView = (DecoratedBarcodeView) findViewById(R.id.barcode_scanner);
+        Collection<BarcodeFormat> formats = Arrays.asList(
+                BarcodeFormat.QR_CODE,
+                BarcodeFormat.CODE_39,
+                BarcodeFormat.UPC_A,
+                BarcodeFormat.CODABAR,
+                BarcodeFormat.CODE_93,
+                BarcodeFormat.EAN_8,
+                BarcodeFormat.EAN_13,
+                BarcodeFormat.UPC_A,
+                BarcodeFormat.AZTEC,
+                BarcodeFormat.UPC_E,
+                BarcodeFormat.UPC_EAN_EXTENSION,
+                BarcodeFormat.CODE_128,
+                BarcodeFormat.DATA_MATRIX,
+                BarcodeFormat.ITF,
+                BarcodeFormat.MAXICODE
+        );
+        barcodeView.setStatusText(getResources().getString(R.string.barcode_instructions));
+        barcodeView.getBarcodeView().setDecoderFactory(new DefaultDecoderFactory(formats));
+        barcodeView.decodeContinuous(callback);
+
+        beepManager = new BeepManager(this);
+        barcodeView.resume();
 
         // TODO: Add to device disk that we opened this store
         // TODO: Setup Kiosk mode
@@ -220,6 +288,18 @@ public class KioskActivity extends AppCompatActivity {
         // Update local array of products in cart so the adapter can get notified
         Cart.updateProductsInCartArray(mProductsInCart, mCatalog);
         mCartItemAdapter.notifyDataSetChanged();
+    }
+
+    private Product findProductWithBarcode(String barcode) {
+        Product product = null;
+
+        for (Product p : mCatalog.values()) {
+            if (p.getBarcode().equals(barcode)) {
+                product = p;
+            }
+        }
+
+        return product;
     }
 
     private void addProductToCart(String productId) {

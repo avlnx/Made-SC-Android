@@ -17,10 +17,12 @@
     modo Quiosque toque o canto superior direito da tela duas vezes.</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
-    <string name="kiosk_welcome_message">Olá! Utilize o leitor de código de barras para adicionar
+    <string name="kiosk_welcome_message">Utilize o leitor de código de barras para adicionar
     produtos ao carrinho :)</string>
     <string name="kiosk_loading_inventory_message">Abastacendo sua loja :)</string>
     <string name="kiosk_loading_catalog_message">Sincronizando o catálogo</string>
+    <string name="barcode_product_not_found">Produto com código %1$s não foi encontrado</string>
+    <string name="barcode_instructions">Enquadre o código de barras na visualização acima e aguarde o beep.</string>
 
     <string name="cart_product_removed_successfully">%1$s removido do carrinho</string>
     <string name="cart_product_added_successfully">%1$s adicionado ao carrinho</string>
