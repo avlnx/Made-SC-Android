@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Made</string>
+    <string name="app_name">made</string>
 
     <!-- Forms -->
     <string name="password_hint">Sua senha</string>
@@ -9,6 +9,7 @@
     <string name="bt_checkout">Checkout</string>
 
     <!-- Messages -->
+    <string name="app_welcome_message">A primeira solução completa de self-checkout do Brasil</string>
     <string name="login_failed_message">O login falhou. Tente novamente.</string>
     <string name="login_form_empty">Os campos email e password são obrigatórios.</string>
     <string name="dialog_confirm_start_store_title">Atenção! O modo Quiosque será ativado!</string>

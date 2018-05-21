@@ -128,7 +128,6 @@ public class KioskActivity extends AppCompatActivity {
         barcodeView.decodeContinuous(callback);
 
         beepManager = new BeepManager(this);
-        barcodeView.resume();
 
         // TODO: Add to device disk that we opened this store
         // TODO: Setup Kiosk mode
@@ -271,7 +270,9 @@ public class KioskActivity extends AppCompatActivity {
         // get the current cart state and update interface
         updateCartInterface();
 
-        // TODO: Show Barcode reader
+        // Show Barcode reader
+        barcodeView.resume();
+        barcodeView.setVisibility(View.VISIBLE);
     }
 
     private void updateCartInterface() {
