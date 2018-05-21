@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +22,8 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartIt
         TextView mQuantityTextView;
         TextView mProductTitleTextView;
         TextView mProductPrice;
+        ImageButton mIncreaseQuantity;
+        ImageButton mDecreaseQuantity;
 
         CartItemViewHolder(View view) {
             super(view);
@@ -28,6 +31,8 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartIt
             mQuantityTextView = (TextView) view.findViewById(R.id.tv_quantity);
             mProductTitleTextView = (TextView) view.findViewById(R.id.tv_product_title);
             mProductPrice = (TextView) view.findViewById(R.id.tv_price);
+            mIncreaseQuantity = (ImageButton) view.findViewById(R.id.ib_increase_quantity);
+            mDecreaseQuantity = (ImageButton) view.findViewById(R.id.ib_decrease_quantity);
         }
     }
 
@@ -65,6 +70,8 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartIt
         holder.mQuantityTextView.setText(Cart.getQuantityInCartForProductRepresentation(product.getProductId()));
         holder.mProductPrice.setText(product.getPublicPriceCurrencyRepresentation());
         holder.mProductTitleTextView.setText(product.getTitle());
+        holder.mIncreaseQuantity.setTag(product.getProductId());
+        holder.mDecreaseQuantity.setTag(product.getProductId());
 
         // TODO: fetch and set image
     }

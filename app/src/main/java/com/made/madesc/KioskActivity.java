@@ -160,11 +160,10 @@ public class KioskActivity extends AppCompatActivity {
         loadCatalog();
     }
 
-    // Barcode Scanning funcitonality, following two methods
+    // Barcode Scanning functionality, following two methods
     public void onClickScan(View v) {
         new IntentIntegrator(this).initiateScan();
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != CUSTOMIZED_REQUEST_CODE && requestCode != IntentIntegrator.REQUEST_CODE) {
@@ -330,14 +329,23 @@ public class KioskActivity extends AppCompatActivity {
         }
     }
 
+    public void onIncreaseQuantityInCartForProduct(View v) {
+        String productId = (String) v.getTag();
+        addProductToCart(productId);
+    }
+
+    public void onDecreaseQuantityInCartForProduct(View v) {
+        String productId = (String) v.getTag();
+        removeProductFromCart(productId);
+    }
+
+    // Debug
     private Product getRandomProductFromInventory() {
         int numOfProducts = mActiveStore.getInventory().size();
         int randomItem = new Random().nextInt(numOfProducts);
         String productId = mActiveStore.getInventory().keySet().toArray()[randomItem].toString();
         return mCatalog.get(productId);
     }
-
-    // Debug
     public void debugAddToCart(View v) {
         // get a random product from the inventory and add it to the scrollview and cart summary
         Product product = getRandomProductFromInventory();
