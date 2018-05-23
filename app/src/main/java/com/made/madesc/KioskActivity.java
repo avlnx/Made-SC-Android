@@ -77,8 +77,7 @@ public class KioskActivity extends AppCompatActivity {
     private BarcodeCallback callback = new BarcodeCallback() {
         @Override
         public void barcodeResult(BarcodeResult result) {
-            if(result.getText() == null) {
-                // Prevent duplicate scans
+            if(result.getText() == null || result.getText().equals(lastText)) {
                 return;
             }
 
@@ -340,6 +339,10 @@ public class KioskActivity extends AppCompatActivity {
     }
 
     // Debug
+    public void onGoToTabs(View v) {
+        Intent intent = new Intent(this, KioskTabbedActivity.class);
+        startActivity(intent);
+    }
     private Product getRandomProductFromInventory() {
         int numOfProducts = mActiveStore.getInventory().size();
         int randomItem = new Random().nextInt(numOfProducts);

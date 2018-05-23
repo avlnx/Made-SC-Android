@@ -75,6 +75,7 @@
             android:onClick="onLogoutButtonPress"
             android:text="@string/bt_logout_text"
             android:textAlignment="textEnd"
+            android:textColor="@color/text_color"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:layout_editor_absoluteX="65dp" />
     </LinearLayout>

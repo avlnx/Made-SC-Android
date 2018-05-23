@@ -33,4 +33,10 @@
     <string name="hello_text">Olá %1$s</string>
     <string name="store_list_loading">Carregando suas lojas</string>
     <string name="store_list_title">Toque em uma de suas lojas para começar a vender</string>
+    <string name="title_activity_kiosk_tabbed">KioskTabbedActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

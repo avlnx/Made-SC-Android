@@ -130,4 +130,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/button"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="onGoToTabs"
+        android:text="Test"
+        app:layout_constraintEnd_toStartOf="@+id/bt_debug_remove_from_cart"
+        app:layout_constraintStart_toEndOf="@+id/bt_debug_add_to_cart"
+        app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
+
 </android.support.constraint.ConstraintLayout>
