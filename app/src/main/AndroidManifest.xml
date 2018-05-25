@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".StoreListActivity" />
-        <activity android:name=".KioskActivity" />
+        <activity
+            android:name=".KioskActivity" />
         <activity
             android:name=".KioskTabbedActivity"
             android:label="@string/title_activity_kiosk_tabbed"

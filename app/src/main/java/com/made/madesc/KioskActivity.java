@@ -3,13 +3,20 @@ package com.made.madesc;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +53,11 @@ import java.util.Random;
 import static android.support.v7.widget.DividerItemDecoration.HORIZONTAL;
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
+// TODO: Add to device disk that we opened this store
+// TODO: Setup Kiosk mode
+// TODO: Setup click handler to leave Kiosk mode
+// TODO: set up fb snapshot querys for updates?
+
 public class KioskActivity extends AppCompatActivity {
 
     // Views
@@ -56,82 +68,46 @@ public class KioskActivity extends AppCompatActivity {
     private LinearLayout mCartSummaryLayout;
     private RecyclerView mCartItemRecyclerView;
 
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
+
     // Data
-    private HashMap<String, Product> mCatalog;
+//    private HashMap<String, Product> mCatalog;
     FirebaseFirestore mDb;
     FirebaseUser mCurrentUser;
     private Store mActiveStore;
     private String mActiveStoreId;
     CartItemAdapter mCartItemAdapter;
-    ArrayList<Product> mProductsInCart;
+    CartItemAdapter mProductsInInventoryAdapter;
+//    ArrayList<Product> mProductsInCart;
     // Barcode
     private static final String TAG = KioskActivity.class.getSimpleName();
-    private DecoratedBarcodeView barcodeView;
-    private BeepManager beepManager;
-    private String lastText;
+
+
 
     public final int CUSTOMIZED_REQUEST_CODE = 0x0000ffff;
 
     public static final String CATALOG = "made";
 
-    private BarcodeCallback callback = new BarcodeCallback() {
-        @Override
-        public void barcodeResult(BarcodeResult result) {
-            if(result.getText() == null || result.getText().equals(lastText)) {
-                return;
-            }
 
-            lastText = result.getText();
-            beepManager.playBeepSoundAndVibrate();
-            Product product = findProductWithBarcode(lastText);
-            if (product != null) {
-                addProductToCart(product);
-            } else {
-                // Product not found
-                String resourceString = getResources().getString(R.string.barcode_product_not_found);
-                Toast.makeText(KioskActivity.this, String.format(resourceString, lastText), Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        public void possibleResultPoints(List<ResultPoint> resultPoints) {
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kiosk);
 
-        // Barcode stuff
-        barcodeView = (DecoratedBarcodeView) findViewById(R.id.barcode_scanner);
-        Collection<BarcodeFormat> formats = Arrays.asList(
-                BarcodeFormat.QR_CODE,
-                BarcodeFormat.CODE_39,
-                BarcodeFormat.UPC_A,
-                BarcodeFormat.CODABAR,
-                BarcodeFormat.CODE_93,
-                BarcodeFormat.EAN_8,
-                BarcodeFormat.EAN_13,
-                BarcodeFormat.UPC_A,
-                BarcodeFormat.AZTEC,
-                BarcodeFormat.UPC_E,
-                BarcodeFormat.UPC_EAN_EXTENSION,
-                BarcodeFormat.CODE_128,
-                BarcodeFormat.DATA_MATRIX,
-                BarcodeFormat.ITF,
-                BarcodeFormat.MAXICODE
-        );
-        barcodeView.setStatusText(getResources().getString(R.string.barcode_instructions));
-        barcodeView.getBarcodeView().setDecoderFactory(new DefaultDecoderFactory(formats));
-        barcodeView.decodeContinuous(callback);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        beepManager = new BeepManager(this);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tl_tabs);
 
-        // TODO: Add to device disk that we opened this store
-        // TODO: Setup Kiosk mode
-        // TODO: Setup click handler to leave Kiosk mode
-        // TODO: set up snapshotquerys for updates?
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.vp_interfaces);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         // Get the storeId for the active store from the intent
         Intent intent = getIntent();
@@ -149,9 +125,8 @@ public class KioskActivity extends AppCompatActivity {
 
         mDb = FirebaseFirestore.getInstance();
 
-        mCatalog = new HashMap<>();
+        mProductsInInventoryAdapter = new CartItemAdapter(Store.getProductsInActiveInventory());
 
-        mProductsInCart = new ArrayList<Product>();
         // set up adapter with empty data, we later update it
         setupCartItemAdapter();
 
@@ -159,10 +134,29 @@ public class KioskActivity extends AppCompatActivity {
         loadCatalog();
     }
 
-    // Barcode Scanning functionality, following two methods
-    public void onClickScan(View v) {
-        new IntentIntegrator(this).initiateScan();
+
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class above).
+//            return PlaceholderFragment.newInstance(position);
+            if (position == 0) return ProductListFragment.newInstance(mProductsInInventoryAdapter);
+            return new BarcodeFragment();
+        }
+
+        @Override
+        public int getCount() {
+            // Show 2 total pages.
+            return 2;
+        }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != CUSTOMIZED_REQUEST_CODE && requestCode != IntentIntegrator.REQUEST_CODE) {
@@ -191,7 +185,7 @@ public class KioskActivity extends AppCompatActivity {
     }
 
     private void setupCartItemAdapter() {
-        mCartItemAdapter = new CartItemAdapter(mProductsInCart);
+        mCartItemAdapter = new CartItemAdapter(Cart.getProductsInCart());
         mCartItemRecyclerView.setAdapter(mCartItemAdapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -216,7 +210,7 @@ public class KioskActivity extends AppCompatActivity {
                                 Log.d("KioskActivity", document.getId() + " => " + document.getData());
                                 Product product = document.toObject(Product.class);
                                 product.setProductId(document.getId());
-                                mCatalog.put(product.getProductId(), product);
+                                Catalog.addToProducts(product);
                             }
                             // Done loading catalog, load inventory for this specific store
                             mMessageTextView.setText(R.string.kiosk_loading_inventory_message);
@@ -241,6 +235,13 @@ public class KioskActivity extends AppCompatActivity {
                                 Log.d("KioskActivity", "DocumentSnapshot data: " + document.getData());
                                 mActiveStore = document.toObject(Store.class);
                                 if (mActiveStore != null) mActiveStore.setStoreId(mActiveStoreId);
+                                Store.loadProductsInActiveInventory(mActiveStore.getInventory());
+                                /*
+                                ArticleFragment articleFrag = (ArticleFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.article_fragment);
+    articleFrag.updateArticleView(position);
+                                 */
+                                mProductsInInventoryAdapter.notifyDataSetChanged();
                                 buildInitialInterface();
                             } else {
                                 Log.d("KioskActivity", "No such document");
@@ -263,14 +264,8 @@ public class KioskActivity extends AppCompatActivity {
         // Show cart summary widget
         mCartSummaryLayout.setVisibility(View.VISIBLE);
 
-        Log.d("KioskActivity", "Catalog data: " + mCatalog.toString());
-
         // get the current cart state and update interface
         updateCartInterface();
-
-        // Show Barcode reader
-        barcodeView.resume();
-        barcodeView.setVisibility(View.VISIBLE);
     }
 
     private void updateCartInterface() {
@@ -285,37 +280,24 @@ public class KioskActivity extends AppCompatActivity {
         mCheckoutButton.setEnabled(!Cart.isEmpty());
 
         // Update local array of products in cart so the adapter can get notified
-        Cart.updateProductsInCartArray(mProductsInCart, mCatalog);
         mCartItemAdapter.notifyDataSetChanged();
     }
 
-    private Product findProductWithBarcode(String barcode) {
-        Product product = null;
-
-        for (Product p : mCatalog.values()) {
-            if (p.getBarcode().equals(barcode)) {
-                product = p;
-            }
-        }
-
-        return product;
-    }
-
-    private void addProductToCart(String productId) {
+    public void addProductToCart(String productId) {
         // get product with this productId and call addProductToCart(Product product)
-        addProductToCart(mCatalog.get(productId));
+        addProductToCart(Catalog.getProductWithId(productId));
     }
-    private void addProductToCart(Product product) {
+    public void addProductToCart(Product product) {
         Cart.addProductToCart(product);
         String resourceString = getResources().getString(R.string.cart_product_added_successfully);
         Toast.makeText(this, String.format(resourceString, product.getTitle()), Toast.LENGTH_SHORT).show();
         updateCartInterface();
     }
 
-    private void removeProductFromCart(String productId) {
-        removeProductFromCart(mCatalog.get(productId));
+    public void removeProductFromCart(String productId) {
+        removeProductFromCart(Catalog.getProductWithId(productId));
     }
-    private void removeProductFromCart(Product product) {
+    public void removeProductFromCart(Product product) {
         boolean success = Cart.removeProductFromCart(product);
         if (success) {
             String resourceString = getResources().getString(R.string.cart_product_removed_successfully);
@@ -347,7 +329,7 @@ public class KioskActivity extends AppCompatActivity {
         int numOfProducts = mActiveStore.getInventory().size();
         int randomItem = new Random().nextInt(numOfProducts);
         String productId = mActiveStore.getInventory().keySet().toArray()[randomItem].toString();
-        return mCatalog.get(productId);
+        return Catalog.getProductWithId(productId);
     }
     public void debugAddToCart(View v) {
         // get a random product from the inventory and add it to the scrollview and cart summary

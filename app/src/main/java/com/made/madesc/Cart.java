@@ -3,6 +3,7 @@ package com.made.madesc;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -11,7 +12,8 @@ import java.util.HashMap;
 public final class Cart {
     private static BigDecimal cartTotal;
     private static int cartNumOfItems;
-    private static HashMap<String, Integer> items;
+    private static HashMap<String, Integer> itemQuantities;
+    private static ArrayList<Product> productsInCart;
 
     private Cart() {}   // private constructor so class isn't instantiated
 
@@ -22,7 +24,12 @@ public final class Cart {
     public static void clearCart() {
         cartNumOfItems = 0;
         cartTotal = new BigDecimal("0");
-        items = new HashMap<>();
+        itemQuantities = new HashMap<>();
+        productsInCart = new ArrayList<>();
+    }
+
+    public static ArrayList<Product> getProductsInCart() {
+        return productsInCart;
     }
 
     public static boolean isEmpty() {
@@ -46,34 +53,19 @@ public final class Cart {
     }
 
     public static HashMap<String, Integer> getItems() {
-        return items;
+        return itemQuantities;
     }
 
-//    public static ArrayList<Product> getItemsWithData(HashMap<String, Product> catalog) {
-//        ArrayList<Product> productsInCartWithData = new ArrayList<>();
-//        for (HashMap.Entry<String, Integer> item : items.entrySet()) {
-//            String productId = item.getKey();
-////            Product product = Product.findProductByIdFromCatalog(catalog, productId);
-////            if (product != null) {
-////                productsInCartWithData.add(product);
-////            }
-//            productsInCartWithData.add(catalog.get(item.getKey()));
-//        }
-//        return productsInCartWithData;
-//    }
-
-    public static void updateProductsInCartArray(ArrayList<Product> products, HashMap<String, Product> catalog) {
-        products.clear();
-        for (HashMap.Entry<String, Integer> item : items.entrySet()) {
-            String productId = item.getKey();
-            products.add(catalog.get(item.getKey()));
+    private static void updateProductsInCartArray() {
+        productsInCart.clear();
+        for (HashMap.Entry<String, Integer> item : itemQuantities.entrySet()) {
+            productsInCart.add(Catalog.getProductWithId(item.getKey()));
         }
     }
 
     public static int getQuantityInCartForProduct(String productId) {
-        return (items.get(productId) == null) ? 0 : items.get(productId);
+        return (itemQuantities.get(productId) == null) ? 0 : itemQuantities.get(productId);
     }
-
     public static String getQuantityInCartForProductRepresentation(String productId) {
         int quantity = getQuantityInCartForProduct(productId);
         return Integer.toString(quantity);
@@ -81,9 +73,10 @@ public final class Cart {
 
     public static void addProductToCart(Product product) {
         int currentQuantityInCart = getQuantityInCartForProduct(product.getProductId());
-        items.put(product.getProductId(), ++currentQuantityInCart);
+        itemQuantities.put(product.getProductId(), ++currentQuantityInCart);
         cartNumOfItems++;
         cartTotal = cartTotal.add(product.getPublicPrice());
+        updateProductsInCartArray();
     }
 
     public static boolean removeProductFromCart(Product product) {
@@ -94,16 +87,17 @@ public final class Cart {
         cartTotal = cartTotal.subtract(product.getPublicPrice());
         // cartTotal can't be negative. This could happen if the price for a product changed mid
         // operation for example from a Firebase snapshot
-        if (cartTotal.compareTo(new BigDecimal("0")) == -1) cartTotal = new BigDecimal("0");
+        if (cartTotal.compareTo(new BigDecimal("0")) < 0) cartTotal = new BigDecimal("0");
 
         currentQuantityInCart--;
 
         if (currentQuantityInCart == 0) {
             // delete key from items HashMap so adapter updates
-            items.remove(product.getProductId());
+            itemQuantities.remove(product.getProductId());
+            updateProductsInCartArray();
             return true;
         }
-        items.put(product.getProductId(), currentQuantityInCart);
+        itemQuantities.put(product.getProductId(), currentQuantityInCart);
         return true;
     }
 }

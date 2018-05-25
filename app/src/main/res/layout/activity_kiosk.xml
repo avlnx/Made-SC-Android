@@ -6,31 +6,18 @@
     android:layout_height="match_parent"
     tools:context="com.made.madesc.KioskActivity">
 
-    <com.journeyapps.barcodescanner.DecoratedBarcodeView
-        android:id="@+id/barcode_scanner"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="8dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/rv_cart_items"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_debug_remove_from_cart">
-
-    </com.journeyapps.barcodescanner.DecoratedBarcodeView>
 
     <TextView
         android:id="@+id/tv_kiosk_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/kiosk_welcome_message"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tl_tabs" />
 
     <ProgressBar
         android:id="@+id/pb_loader"
@@ -143,5 +130,38 @@
         app:layout_constraintEnd_toStartOf="@+id/bt_debug_remove_from_cart"
         app:layout_constraintStart_toEndOf="@+id/bt_debug_add_to_cart"
         app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_interfaces"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_cart_items"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button" />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tl_tabs"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/tv_kiosk_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/ti_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lista" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/ti_barcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Código de Barras" />
+
+    </android.support.design.widget.TabLayout>
 
 </android.support.constraint.ConstraintLayout>
