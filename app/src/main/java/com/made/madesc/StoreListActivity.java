@@ -1,12 +1,13 @@
 package com.made.madesc;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,13 +17,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.made.madesc.model.StoreListViewModel;
 
 import java.util.ArrayList;
 
@@ -40,6 +38,8 @@ public class StoreListActivity extends AppCompatActivity {
     ArrayList<Store> mStores;
     StoreListAdapter mStoreListAdapter;
 
+    private StoreListViewModel mStoreModel;
+
     public static final String ACTIVE_STORE = "com.made.madesc.ACTIVE_STORE";
 
     @Override
@@ -55,10 +55,22 @@ public class StoreListActivity extends AppCompatActivity {
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         mDb = FirebaseFirestore.getInstance();
 
-        mStores = new ArrayList<Store>();
-
-        // set up adapter with empty data, we later update it
-        setupStoreListAdapter();
+        mStoreModel = ViewModelProviders.of(this).get(StoreListViewModel.class);
+        mStoreModel.getStores().observe(this, new Observer<ArrayList<Store>>() {
+            @Override
+            public void onChanged(@Nullable ArrayList<Store> stores) {
+                if (stores != null) {
+                    mStores = stores;
+                    // If StoreListAdapter is not set yet set it
+                    if (mStoreListAdapter == null) {
+                        setupStoreListAdapter();
+                    }
+                    // Notify changes in the stores adapter now that we have the data
+                    mStoreListAdapter.notifyDataSetChanged();
+                    updateUiAfterLoad();
+                }
+            }
+        });
 
         String userEmail = "";
         try {
@@ -70,28 +82,6 @@ public class StoreListActivity extends AppCompatActivity {
         }
         TextView textViewUserId = findViewById(R.id.tv_user_id);
         textViewUserId.setText(getResources().getString(R.string.hello_text, userEmail));
-
-        // Get the stores for the logged in user
-        mDb.collection("users").document(mCurrentUser.getUid()).collection("stores")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("StoreListActivity", document.getId() + " => " + document.getData());
-                                Store store = document.toObject(Store.class);
-                                store.setStoreId(document.getId());
-                                mStores.add(store);
-                            }
-                            // Notify changes in the stores adapter now that we have the data
-                            mStoreListAdapter.notifyDataSetChanged();
-                            updateUiAfterLoad();
-                        } else {
-                            Log.w("StoreListActivity", "Error getting documents.", task.getException());
-                        }
-                    }
-                });
     }
 
     private void updateUiAfterLoad() {

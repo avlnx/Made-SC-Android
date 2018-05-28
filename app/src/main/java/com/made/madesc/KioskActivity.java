@@ -79,7 +79,6 @@ public class KioskActivity extends AppCompatActivity {
     private String mActiveStoreId;
     CartItemAdapter mCartItemAdapter;
     CartItemAdapter mProductsInInventoryAdapter;
-//    ArrayList<Product> mProductsInCart;
     // Barcode
     private static final String TAG = KioskActivity.class.getSimpleName();
 
