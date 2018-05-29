@@ -7,29 +7,16 @@
     tools:context="com.made.madesc.KioskActivity">
 
 
-    <TextView
-        android:id="@+id/tv_kiosk_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/kiosk_welcome_message"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tl_tabs" />
-
     <ProgressBar
         android:id="@+id/pb_loader"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
         android:indeterminate="true"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/lay_cart_summary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/lay_cart_summary"
@@ -85,83 +72,64 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Inverse" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/bt_debug_add_to_cart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:onClick="debugAddToCart"
-        android:text="Add to cart"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
-
-    <Button
-        android:id="@+id/bt_debug_remove_from_cart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
-        android:onClick="debugRemoveFromCart"
-        android:text="Remove from cart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_cart_items"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:maxHeight="200dp"
+        android:layout_width="350dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/lay_cart_summary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/button"
-        style="@style/Widget.AppCompat.Button.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:onClick="onGoToTabs"
-        android:text="Test"
-        app:layout_constraintEnd_toStartOf="@+id/bt_debug_remove_from_cart"
-        app:layout_constraintStart_toEndOf="@+id/bt_debug_add_to_cart"
-        app:layout_constraintTop_toBottomOf="@+id/tv_kiosk_message" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vp_interfaces"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/rv_cart_items"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/lay_cart_summary"
+        app:layout_constraintEnd_toStartOf="@+id/rv_cart_items"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/tl_tabs" />
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tl_tabs"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/tv_kiosk_message"
+        android:background="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="@android:color/white"
+        tools:tabTextColor="@android:color/white">
 
         <android.support.design.widget.TabItem
             android:id="@+id/ti_list"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Lista" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/ti_barcode"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Código de Barras" />
 
     </android.support.design.widget.TabLayout>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Seu Carrinho"
+        android:textAlignment="viewStart"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/rv_cart_items"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/rv_cart_items"
+        app:layout_constraintTop_toBottomOf="@+id/tl_tabs" />
 
 </android.support.constraint.ConstraintLayout>

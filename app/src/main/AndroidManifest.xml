@@ -20,11 +20,11 @@
         </activity>
         <activity android:name=".StoreListActivity" />
         <activity
-            android:name=".KioskActivity" />
+            android:name=".KioskActivity"/>
         <activity
             android:name=".KioskTabbedActivity"
             android:label="@string/title_activity_kiosk_tabbed"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

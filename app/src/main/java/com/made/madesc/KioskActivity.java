@@ -1,8 +1,11 @@
 package com.made.madesc;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +44,7 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 import com.journeyapps.barcodescanner.DefaultDecoderFactory;
+import com.made.madesc.model.KioskViewModel;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -61,7 +65,7 @@ import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 public class KioskActivity extends AppCompatActivity {
 
     // Views
-    private TextView mMessageTextView;
+//    private TextView mMessageTextView;
     private TextView mCartNumOfItemsTextView;
     private TextView mCartTotalTextView;
     private Button mCheckoutButton;
@@ -78,15 +82,21 @@ public class KioskActivity extends AppCompatActivity {
     private Store mActiveStore;
     private String mActiveStoreId;
     CartItemAdapter mCartItemAdapter;
-    CartItemAdapter mProductsInInventoryAdapter;
+    InventoryItemAdapter mProductsInInventoryAdapter;
     // Barcode
     private static final String TAG = KioskActivity.class.getSimpleName();
+    private HashMap<String,Product> mCatalog;
+    private ArrayList<Product> mProductsInInventory;
 
 
 
     public final int CUSTOMIZED_REQUEST_CODE = 0x0000ffff;
 
     public static final String CATALOG = "made";
+
+    private KioskViewModel mKioskModel;
+
+    private Cart mCart;
 
 
 
@@ -98,6 +108,13 @@ public class KioskActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        try {
+            getSupportActionBar().setElevation(0);
+        }
+        catch (Exception e) {
+            Log.d( "KioskActivity", "Could not disable elevation in action bar");
+        }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tl_tabs);
 
@@ -112,25 +129,59 @@ public class KioskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mActiveStoreId = intent.getStringExtra(StoreListActivity.ACTIVE_STORE);
 
-        mMessageTextView = findViewById(R.id.tv_kiosk_message);
-        mMessageTextView.setText(R.string.kiosk_loading_catalog_message);
+        // Get model and set active store id
+        mKioskModel = ViewModelProviders.of(this).get(KioskViewModel.class);
+        mKioskModel.setActiveStoreId(mActiveStoreId);
+
+
+//        mMessageTextView = findViewById(R.id.tv_kiosk_message);
+//        mMessageTextView.setText(R.string.kiosk_loading_catalog_message);
+
         mCartSummaryLayout = findViewById(R.id.lay_cart_summary);
         mCartNumOfItemsTextView = findViewById(R.id.tv_cart_num_of_items);
         mCartTotalTextView = findViewById(R.id.tv_cart_total);
         mCheckoutButton = findViewById(R.id.bt_checkout);
         mCartItemRecyclerView = findViewById(R.id.rv_cart_items);
 
-        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        mKioskModel.getCatalog().observe(this, new Observer<HashMap<String,Product>>() {
+//            @Override
+//            public void onChanged(@Nullable HashMap<String,Product> products) {
+//                if (products != null) {
+//                    // catalog loaded, load store
+//                    mCatalog = products;
+//                }
+//            }
+//        });
 
-        mDb = FirebaseFirestore.getInstance();
+        mKioskModel.getActiveStore().observe(this, new Observer<Store>() {
+            @Override
+            public void onChanged(@Nullable Store store) {
+                if (store != null) {
+                    // store inventory loaded (which means catalog is also loaded)
+                    mActiveStore = store;
+                    mProductsInInventory = store.getListOfProductsWithData();
+                    mProductsInInventoryAdapter = new InventoryItemAdapter(mProductsInInventory);
+                }
+            }
+        });
 
-        mProductsInInventoryAdapter = new CartItemAdapter(Store.getProductsInActiveInventory());
+        mKioskModel.getCart().observe(this, new Observer<Cart>() {
+            @Override
+            public void onChanged(@Nullable Cart cart) {
+                if (cart != null) {
+                    // Got a new cart, update ui, setup adapter if not set
+                    mCart = cart;
+                    if (mCartItemAdapter == null) {
+                        // First time around, setup adapter and when done build initial interface
+                        setupCartItemAdapter();
+                        buildInitialInterface();
+                    }
+                    updateCartInterface();
+                }
+            }
+        });
 
-        // set up adapter with empty data, we later update it
-        setupCartItemAdapter();
-
-        // Load catalog (template)
-        loadCatalog();
+//        buildInitialInterface();
     }
 
 
@@ -184,7 +235,7 @@ public class KioskActivity extends AppCompatActivity {
     }
 
     private void setupCartItemAdapter() {
-        mCartItemAdapter = new CartItemAdapter(Cart.getProductsInCart());
+        mCartItemAdapter = new CartItemAdapter(mCart.getProductsInCart(), mCart);
         mCartItemRecyclerView.setAdapter(mCartItemAdapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -198,85 +249,25 @@ public class KioskActivity extends AppCompatActivity {
         mCartItemRecyclerView.addItemDecoration(itemDecor);
     }
 
-    private void loadCatalog() {
-        mDb.collection("catalog").document(CATALOG).collection("products")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("KioskActivity", document.getId() + " => " + document.getData());
-                                Product product = document.toObject(Product.class);
-                                product.setProductId(document.getId());
-                                Catalog.addToProducts(product);
-                            }
-                            // Done loading catalog, load inventory for this specific store
-                            mMessageTextView.setText(R.string.kiosk_loading_inventory_message);
-                            loadInventory();
-                        } else {
-                            Log.w("KioskActivity", "Error getting catalog.", task.getException());
-                        }
-                    }
-                });
-    }
-
-    private void loadInventory() {
-        mDb.collection("users").document(mCurrentUser.getUid()).collection("stores")
-                .document(mActiveStoreId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                Log.d("KioskActivity", "DocumentSnapshot data: " + document.getData());
-                                mActiveStore = document.toObject(Store.class);
-                                if (mActiveStore != null) mActiveStore.setStoreId(mActiveStoreId);
-                                Store.loadProductsInActiveInventory(mActiveStore.getInventory());
-                                /*
-                                ArticleFragment articleFrag = (ArticleFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.article_fragment);
-    articleFrag.updateArticleView(position);
-                                 */
-                                mProductsInInventoryAdapter.notifyDataSetChanged();
-                                buildInitialInterface();
-                            } else {
-                                Log.d("KioskActivity", "No such document");
-                            }
-                        } else {
-                            Log.d("KioskActivity", "Error getting inventory", task.getException());
-                        }
-                    }
-                });
-    }
-
     private void buildInitialInterface() {
-        // Finished loading, update ui
-        mMessageTextView.setText(R.string.kiosk_welcome_message);
-
         // Hide progress bar
         ProgressBar progressBar = findViewById(R.id.pb_loader);
         progressBar.setVisibility(View.GONE);
 
         // Show cart summary widget
         mCartSummaryLayout.setVisibility(View.VISIBLE);
-
-        // get the current cart state and update interface
-        updateCartInterface();
     }
 
     private void updateCartInterface() {
-        mCartTotalTextView.setText(Cart.getCartTotalCurrencyRepresentation());
-        if (Cart.isEmpty()) {
+        mCartTotalTextView.setText(mCart.getCartTotalCurrencyRepresentation());
+        if (mCart.isEmpty()) {
             mCartNumOfItemsTextView.setVisibility(View.INVISIBLE);
         } else {
             mCartNumOfItemsTextView.setVisibility(View.VISIBLE);
-            mCartNumOfItemsTextView.setText(Cart.getCartNumOfItemsRepresentation());
+            mCartNumOfItemsTextView.setText(mCart.getCartNumOfItemsRepresentation());
         }
         // Disable or enable checkout button based on the emptyness of the cart
-        mCheckoutButton.setEnabled(!Cart.isEmpty());
+        mCheckoutButton.setEnabled(!mCart.isEmpty());
 
         // Update local array of products in cart so the adapter can get notified
         mCartItemAdapter.notifyDataSetChanged();
@@ -284,20 +275,20 @@ public class KioskActivity extends AppCompatActivity {
 
     public void addProductToCart(String productId) {
         // get product with this productId and call addProductToCart(Product product)
-        addProductToCart(Catalog.getProductWithId(productId));
+        addProductToCart(mActiveStore.getProductFromInventoryWithId(productId));
     }
     public void addProductToCart(Product product) {
-        Cart.addProductToCart(product);
+        mCart.addProductToCart(product);
         String resourceString = getResources().getString(R.string.cart_product_added_successfully);
         Toast.makeText(this, String.format(resourceString, product.getTitle()), Toast.LENGTH_SHORT).show();
         updateCartInterface();
     }
 
     public void removeProductFromCart(String productId) {
-        removeProductFromCart(Catalog.getProductWithId(productId));
+        removeProductFromCart(mActiveStore.getProductFromInventoryWithId(productId));
     }
     public void removeProductFromCart(Product product) {
-        boolean success = Cart.removeProductFromCart(product);
+        boolean success = mCart.removeProductFromCart(product);
         if (success) {
             String resourceString = getResources().getString(R.string.cart_product_removed_successfully);
             Toast.makeText(this, String.format(resourceString, product.getTitle()), Toast.LENGTH_SHORT).show();
@@ -318,6 +309,9 @@ public class KioskActivity extends AppCompatActivity {
         String productId = (String) v.getTag();
         removeProductFromCart(productId);
     }
+
+
+
 
     // Debug
     public void onGoToTabs(View v) {

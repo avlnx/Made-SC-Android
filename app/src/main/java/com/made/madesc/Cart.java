@@ -9,69 +9,65 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public final class Cart {
-    private static BigDecimal cartTotal;
-    private static int cartNumOfItems;
-    private static HashMap<String, Integer> itemQuantities;
-    private static ArrayList<Product> productsInCart;
+public class Cart {
+    private BigDecimal cartTotal;
+    private int cartNumOfItems;
+    private HashMap<String, Integer> itemQuantities;
+    private ArrayList<Product> productsInCart;
+    private Store mActiveStore;
 
-    private Cart() {}   // private constructor so class isn't instantiated
-
-    static {
-        clearCart();
-    }
-
-    public static void clearCart() {
+    public Cart(Store store) {
         cartNumOfItems = 0;
         cartTotal = new BigDecimal("0");
         itemQuantities = new HashMap<>();
         productsInCart = new ArrayList<>();
+        mActiveStore = store;
     }
 
-    public static ArrayList<Product> getProductsInCart() {
+    public ArrayList<Product> getProductsInCart() {
         return productsInCart;
     }
 
-    public static boolean isEmpty() {
+    public boolean isEmpty() {
         return cartNumOfItems == 0;
     }
 
-    public static BigDecimal getCartTotal() {
+    public BigDecimal getCartTotal() {
         return cartTotal;
     }
 
-    public static String getCartTotalCurrencyRepresentation() {
+    public String getCartTotalCurrencyRepresentation() {
         return NumberFormat.getCurrencyInstance().format(cartTotal);
     }
 
-    public static int getCartNumOfItems() {
+    public int getCartNumOfItems() {
         return cartNumOfItems;
     }
 
-    public static String getCartNumOfItemsRepresentation() {
+    public String getCartNumOfItemsRepresentation() {
         return Integer.toString(cartNumOfItems);
     }
 
-    public static HashMap<String, Integer> getItems() {
+    public HashMap<String, Integer> getItems() {
         return itemQuantities;
     }
 
-    private static void updateProductsInCartArray() {
+    private void updateProductsInCartArray() {
         productsInCart.clear();
         for (HashMap.Entry<String, Integer> item : itemQuantities.entrySet()) {
-            productsInCart.add(Catalog.getProductWithId(item.getKey()));
+            productsInCart.add(mActiveStore.getProductFromInventoryWithId(item.getKey()));
         }
     }
 
-    public static int getQuantityInCartForProduct(String productId) {
+    public int getQuantityInCartForProduct(String productId) {
         return (itemQuantities.get(productId) == null) ? 0 : itemQuantities.get(productId);
     }
-    public static String getQuantityInCartForProductRepresentation(String productId) {
+    public String getQuantityInCartForProductRepresentation(String productId) {
         int quantity = getQuantityInCartForProduct(productId);
         return Integer.toString(quantity);
     }
 
-    public static void addProductToCart(Product product) {
+    public void addProductToCart(Product product) {
         int currentQuantityInCart = getQuantityInCartForProduct(product.getProductId());
         itemQuantities.put(product.getProductId(), ++currentQuantityInCart);
         cartNumOfItems++;
@@ -79,7 +75,7 @@ public final class Cart {
         updateProductsInCartArray();
     }
 
-    public static boolean removeProductFromCart(Product product) {
+    public boolean removeProductFromCart(Product product) {
         int currentQuantityInCart = getQuantityInCartForProduct(product.getProductId());
         if (currentQuantityInCart == 0) return false;
 

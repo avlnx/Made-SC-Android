@@ -1,5 +1,8 @@
 package com.made.madesc;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 import com.journeyapps.barcodescanner.DefaultDecoderFactory;
+import com.made.madesc.model.KioskViewModel;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +29,9 @@ public class BarcodeFragment extends Fragment {
     private BeepManager beepManager;
 
     private String lastText;
+    private KioskViewModel mKioskViewModel;
+
+    private Cart mCart;
 
     public BarcodeFragment() {
 
@@ -41,7 +48,7 @@ public class BarcodeFragment extends Fragment {
             beepManager.playBeepSoundAndVibrate();
             Product product = Catalog.findProductWithBarcode(lastText);
             if (product != null) {
-                Cart.addProductToCart(product);
+                mCart.addProductToCart(product);
             } else {
                 // Product not found
                 String resourceString = getResources().getString(R.string.barcode_product_not_found);
@@ -58,6 +65,15 @@ public class BarcodeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_kiosk_barcode, container, false);
+
+        // Get a reference to the viewmodel so we can get the cart
+        mKioskViewModel = ViewModelProviders.of(getActivity()).get(KioskViewModel.class);
+        mKioskViewModel.getCart().observe(getActivity(), new Observer<Cart>() {
+            @Override
+            public void onChanged(@Nullable Cart cart) {
+                mCart = cart;
+            }
+        });
 
         // Barcode stuff
         barcodeView = (DecoratedBarcodeView) view.findViewById(R.id.barcode_scanner);
@@ -84,11 +100,20 @@ public class BarcodeFragment extends Fragment {
 
         beepManager = new BeepManager(getActivity());
 
-        // Show Barcode reader
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         barcodeView.resume();
         barcodeView.setVisibility(View.VISIBLE);
+    }
 
-        return view;
+    @Override
+    public void onStop() {
+        super.onStop();
+        barcodeView.pause();
     }
 
     @Override
@@ -104,6 +129,6 @@ public class BarcodeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        barcodeView.pause();
+//        barcodeView.pause();
     }
 }

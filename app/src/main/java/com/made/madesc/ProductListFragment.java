@@ -1,5 +1,7 @@
 package com.made.madesc;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -11,13 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.made.madesc.model.KioskViewModel;
+
+import java.util.HashMap;
+
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
 public class ProductListFragment extends Fragment {
 
-    private CartItemAdapter mCartItemAdapter;
+    private InventoryItemAdapter mInventoryItemAdapter;
     private RecyclerView mProductListItemRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
+    private KioskViewModel mKioskModel;
+    private Store mActiveStore;
+    private HashMap<String, Product> mCatalog;
 
     public ProductListFragment() {}
 
@@ -32,15 +41,15 @@ public class ProductListFragment extends Fragment {
     }
      */
 
-    public static ProductListFragment newInstance(CartItemAdapter cartItemAdapter) {
+    public static ProductListFragment newInstance(InventoryItemAdapter cartItemAdapter) {
         ProductListFragment fragment = new ProductListFragment();
-        fragment.mCartItemAdapter = cartItemAdapter;
+        fragment.mInventoryItemAdapter = cartItemAdapter;
         return fragment;
     }
 
-    private void setupCartItemAdapter() {
-        mCartItemAdapter = new CartItemAdapter(Store.getProductsInActiveInventory());
-        mProductListItemRecyclerView.setAdapter(mCartItemAdapter);
+    private void setupInventoryItemAdapter() {
+        mInventoryItemAdapter = new InventoryItemAdapter(mActiveStore.getListOfProductsWithData());
+        mProductListItemRecyclerView.setAdapter(mInventoryItemAdapter);
         mProductListItemRecyclerView.setLayoutManager(mLinearLayoutManager);
         mProductListItemRecyclerView.setHasFixedSize(true);
         // Add horizontal divider
@@ -50,7 +59,7 @@ public class ProductListFragment extends Fragment {
     }
 
     public void updateCartItemAdapterDataSet() {
-        mCartItemAdapter.notifyDataSetChanged();
+        mInventoryItemAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -59,13 +68,35 @@ public class ProductListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_kiosk_list, container, false);
         mProductListItemRecyclerView = view.findViewById(R.id.rv_product_list);
         mLinearLayoutManager = new LinearLayoutManager(view.getContext());
+
+        // Get viewmodel so we can get the store's data (and cart if needed)
+        mKioskModel = ViewModelProviders.of(getActivity()).get(KioskViewModel.class);
+        // Get catalog to get inventory
+//        mKioskModel.getCatalog().observe(getActivity(), new Observer<HashMap<String, Product>>() {
+//            @Override
+//            public void onChanged(@Nullable HashMap<String, Product> stringProductHashMap) {
+//                mCatalog = stringProductHashMap;
+//            }
+//        });
+
+        mKioskModel.getActiveStore().observe(getActivity(), new Observer<Store>() {
+            @Override
+            public void onChanged(@Nullable Store store) {
+                mActiveStore = store;
+                if (mInventoryItemAdapter == null) {
+                    // first time around, setup adapter
+                    setupInventoryItemAdapter();
+                }
+                updateCartItemAdapterDataSet();
+            }
+        });
+
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setupCartItemAdapter();
     }
 
     @Override

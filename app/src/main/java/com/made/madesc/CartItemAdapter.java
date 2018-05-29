@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartItemViewHolder>  {
     private ArrayList<Product> mDataSet;
+    private Cart mCart;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -22,8 +23,8 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartIt
         TextView mQuantityTextView;
         TextView mProductTitleTextView;
         TextView mProductPrice;
-        ImageButton mIncreaseQuantity;
-        ImageButton mDecreaseQuantity;
+//        ImageButton mIncreaseQuantity;
+//        ImageButton mDecreaseQuantity;
 
         CartItemViewHolder(View view) {
             super(view);
@@ -31,14 +32,15 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartIt
             mQuantityTextView = (TextView) view.findViewById(R.id.tv_quantity);
             mProductTitleTextView = (TextView) view.findViewById(R.id.tv_product_title);
             mProductPrice = (TextView) view.findViewById(R.id.tv_price);
-            mIncreaseQuantity = (ImageButton) view.findViewById(R.id.ib_increase_quantity);
-            mDecreaseQuantity = (ImageButton) view.findViewById(R.id.ib_decrease_quantity);
+//            mIncreaseQuantity = (ImageButton) view.findViewById(R.id.ib_increase_quantity);
+//            mDecreaseQuantity = (ImageButton) view.findViewById(R.id.ib_decrease_quantity);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    CartItemAdapter(ArrayList<Product> products) {
+    CartItemAdapter(ArrayList<Product> products, Cart cart) {
         this.mDataSet = products;
+        this.mCart = cart;
     }
 
     // Create new views (invoked by the layout manager)
@@ -67,11 +69,11 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.CartIt
         // - replace the contents of the view with that element
         Product product = mDataSet.get(position);
 
-        holder.mQuantityTextView.setText(Cart.getQuantityInCartForProductRepresentation(product.getProductId()));
+        holder.mQuantityTextView.setText(mCart.getQuantityInCartForProductRepresentation(product.getProductId()));
         holder.mProductPrice.setText(product.getPublicPriceCurrencyRepresentation());
         holder.mProductTitleTextView.setText(product.getTitle());
-        holder.mIncreaseQuantity.setTag(product.getProductId());
-        holder.mDecreaseQuantity.setTag(product.getProductId());
+//        holder.mIncreaseQuantity.setTag(product.getProductId());
+//        holder.mDecreaseQuantity.setTag(product.getProductId());
 
         // TODO: fetch and set image
     }

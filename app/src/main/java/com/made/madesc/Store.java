@@ -8,31 +8,18 @@ public class Store {
     private boolean isActive;
     private String nickname;
     private String storeId;
-    private static ArrayList<Product> productsInActiveInventory;
+    private ArrayList<Product> productsInInventory;
 
-//    public static Store activeStore;
-
-    static {
-        productsInActiveInventory = new ArrayList<>();
+    public Store() {
+        productsInInventory = new ArrayList<>();
     }
-
-    public Store() {}
 
     public Store(HashMap<String, Integer> inventory, boolean isActive, String nickname) {
         this.inventory = inventory;
         this.isActive = isActive;
         this.nickname = nickname;
-//        productsInActiveInventory = new ArrayList<>();
-//        loadProductsInActiveInventory(inventory);
+        productsInInventory = new ArrayList<>();
     }
-
-//    private static void initializeActiveStore() {
-//        activeStore = new Store(new HashMap<String, Integer>(), true, "Loading");
-//    }
-//
-//    public static void updateActiveStore(Store store) {
-//        activeStore = store;
-//    }
 
     public String getStoreId() {
         return storeId;
@@ -66,14 +53,58 @@ public class Store {
         return nickname;
     }
 
-    public static ArrayList<Product> getProductsInActiveInventory() {
-        return productsInActiveInventory;
+//    public ArrayList<Product> getListOfProductsWithData(HashMap<String,Product> catalog) {
+//        productsInInventory.clear();
+//        for (HashMap.Entry<String, Integer> item : inventory.entrySet()) {
+//            productsInInventory.add(catalog.get(item.getKey()));
+//        }
+//
+//        return productsInInventory;
+//    }
+
+    public ArrayList<Product> getListOfProductsWithData() {
+        return productsInInventory;
     }
 
-    public static void loadProductsInActiveInventory(HashMap<String, Integer> inventory) {
-        productsInActiveInventory.clear();
+    public Product getProductFromInventoryWithId(String productId) {
+        Product p = null;
+        for (Product product : productsInInventory) {
+            if (product.getProductId().equals(productId)) {
+                p = product;
+                break;
+            }
+        }
+        return p;
+    }
+
+
+    public void addProductDataToInventory(HashMap<String,Product> catalog) {
+        productsInInventory.clear();
         for (HashMap.Entry<String, Integer> item : inventory.entrySet()) {
-            productsInActiveInventory.add(Catalog.getProductWithId(item.getKey()));
+            productsInInventory.add(catalog.get(item.getKey()));
         }
     }
+
+//    public void loadProductData(ArrayList<Product> catalog) {
+//        for (HashMap.Entry<String, Integer> item : inventory.entrySet()) {
+//            productsInActiveInventory.add(Catalog.getProductWithId(item.getKey()));
+//        }
+//    }
+
+//    public static ArrayList<Product> getProductsInActiveInventory() {
+//        return productsInActiveInventory;
+//    }
+
+//    public ArrayList<Product> getProductsInInventoryAsList(ArrayList<Product> catalog) {
+//        for (HashMap.Entry<String, Integer> item : inventory.entrySet()) {
+//            productsInActiveInventory.add(Catalog.getProductWithId(item.getKey()));
+//        }
+//    }
+//
+//    public void loadProductsInInventory() {
+//        productsInActiveInventory.clear();
+//        for (HashMap.Entry<String, Integer> item : inventory.entrySet()) {
+//            productsInActiveInventory.add(Catalog.getProductWithId(item.getKey()));
+//        }
+//    }
 }
