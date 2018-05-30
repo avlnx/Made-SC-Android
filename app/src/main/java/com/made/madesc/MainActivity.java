@@ -42,14 +42,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable FirebaseUser currentUser) {
                 if (currentUser != null) {
-                    goToStoreList();
+                    continueApp();
                 }
             }
         });
     }
 
-    private void goToStoreList() {
-        Intent intent = new Intent(this, StoreListActivity.class);
+    private void continueApp() {
+        Intent intent = new Intent(this, ValidationActivity.class);
         startActivity(intent);
     }
 

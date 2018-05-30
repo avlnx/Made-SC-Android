@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.made.madesc">
 
+    <!-- Permissoes necessarias para o pleno funcionamento do aplicativo e da SDK -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
@@ -19,12 +27,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".StoreListActivity" />
-        <activity
-            android:name=".KioskActivity"/>
+        <activity android:name=".KioskActivity" />
         <activity
             android:name=".KioskTabbedActivity"
             android:label="@string/title_activity_kiosk_tabbed"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ValidationActivity"></activity>
     </application>
 
 </manifest>
