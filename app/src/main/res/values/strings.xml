@@ -29,6 +29,11 @@
     <string name="cart_product_added_successfully">%1$s adicionado ao carrinho</string>
     <string name="cart_product_not_in_cart">Ops! %1$s não está no seu carrinho.</string>
 
+    <string name="pinpad_welcome">Vamos conectar um pinpad para concretizar suas vendas.</string>
+    <string name="pinpad_instructions">Clique em um dos dispositivos encontrados abaixo para iniciar.
+    Caso o seu pinpad não se encontre na lista confirme que você o conectou através das
+    configurações bluetooth do seu aparelho.</string>
+
     <!-- Interface -->
     <string name="hello_text">Olá %1$s</string>
     <string name="store_list_loading">Carregando suas lojas</string>

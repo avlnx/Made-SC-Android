@@ -50,7 +50,7 @@ dependencies {
 
     // Permissions Dispatcher
     def pd_latest_version = "3.2.0"
-    implementation ("com.github.hotchemi:permissionsdispatcher:$pd_latest_version") {
+    implementation("com.github.hotchemi:permissionsdispatcher:$pd_latest_version") {
         // if you don't use android.app.Fragment you can exclude support for them
         exclude module: "support-v13"
     }

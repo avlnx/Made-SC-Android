@@ -32,7 +32,8 @@
             android:name=".KioskTabbedActivity"
             android:label="@string/title_activity_kiosk_tabbed"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ValidationActivity"></activity>
+        <activity android:name=".ValidationActivity" />
+        <activity android:name=".PinpadActivity"></activity>
     </application>
 
 </manifest>

@@ -106,6 +106,8 @@ public class StoreListActivity extends AppCompatActivity {
         return new StoreListAdapter.CustomItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
+                // TODO: Check if we have a pinpad connected, otherwise don't continue
+
                 Log.d("StoreListActivity", "clicked position:" + position);
                 String storeId = mStores.get(position).getStoreId();
                 startKioskMode(storeId);

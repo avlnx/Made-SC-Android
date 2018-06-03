@@ -106,7 +106,7 @@ public class ValidationActivity extends AppCompatActivity {
     }
 
     private void continueApp() {
-        Intent intent = new Intent(this, StoreListActivity.class);
+        Intent intent = new Intent(this, PinpadActivity.class);
         startActivity(intent);
     }
 

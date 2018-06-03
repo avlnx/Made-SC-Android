@@ -180,8 +180,6 @@ public class KioskActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        buildInitialInterface();
     }
 
 
